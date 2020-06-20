@@ -1,11 +1,14 @@
 import React from 'react';
+import Home from './component/home/home';
 
-function App() {
+const HomeContainer = () =>  {
+  const fetchValues = values => {
+    alert(JSON.stringify(values));
+  }
+
   return (
-    <div className="App">
-      hello
-    </div>
+      <Home onSubmit={fetchValues}/>
   );
 }
 
-export default App;
+export default HomeContainer;
