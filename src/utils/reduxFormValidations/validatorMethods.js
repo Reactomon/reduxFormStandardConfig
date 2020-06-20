@@ -1,3 +1,7 @@
+const ACCEPTED_CREDIT_CARDS = {
+  AMEX: 'AMEX',
+};
+
 function requiredValidator(value, isRequired) {
   return !isRequired || (value || '').toString().length > 0;
 }
@@ -16,7 +20,7 @@ function maxLengthValidator(value, maxLength) {
 
 function phoneValidator(value) {
   if ((value || '').length === 0) {
-    return true;
+    return true; // otherwise it's always mandatory
   }
   const validFormat = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/.test(value);
 
@@ -88,6 +92,7 @@ function userBirthdayValidator(value, param, linkedProps) {
 
 function cardNumberForTypeValidator(value, param, linkedProps, linkedFields) {
   const cleanValue = (value || '').replace(/\D/g, '');
+  // no type, invalid CC numbr
   const cardType = linkedProps[0] || linkedFields[0];
   if (!cardType) {
     return false;
@@ -99,13 +104,15 @@ function cardNumberForTypeValidator(value, param, linkedProps, linkedFields) {
 
   return (
     cleanValue.length === 0 ||
-    isValidAmex ||
+    isValidAmex || // editing amex card
     isValidNonAmex
-  );
+  ); // editing amex card
 }
 
 function plccEnabledValidator(value, param, linkedProps, linkedFields) {
   const cleanValue = (value || '').replace(/\D/g, '');
+  // For PLCC card it was returning false and then UI shows the error, which should not happen.
+  // Added PLCC card option for this.
   const cardType = linkedProps[0] || linkedFields[0];
   return (
     !(cleanValue.length > 0 && cardType === 'PLACE CARD' && !linkedProps[1]) ||
@@ -113,10 +120,12 @@ function plccEnabledValidator(value, param, linkedProps, linkedFields) {
   );
 }
 
+// TODO - Add test case (Ajay Saini)
 function numberValidator(value) {
   return /^(?:-?\d+|-?\d{1,3}(?:,\d{3})+)?(?:\.\d+)?$/.test(value);
 }
 
+// TODO - Add test case (Ajay Saini)
 function lengthValidator(value, length) {
   const len = (value || '').length;
   return len === 0 || len === length;
@@ -200,6 +209,11 @@ function notEqualToValidator(value, linkedFieldsValues) {
   return value !== linkedFieldsValues[0];
 }
 
+/**
+ * @function - nonSequentialNumberValidator
+ *
+ * @param {*} value  - value to be validated for having non sequestial numbers
+ */
 const nonSequentialNumberValidator = value => {
   if (!value) {
     return true;
